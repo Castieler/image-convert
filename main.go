@@ -56,11 +56,15 @@ func Convert(sourceImage, tagDockerHubUser string, push, pull bool) error {
 	if len(sourceImage) == 0 {
 		return errors.New("需要指定 --s-image ")
 	}
+	if strings.Contains(sourceImage, "@") {
+		sourceImage = strings.Split(sourceImage, "@")[0]
+		logrus.Warnf("原始镜像自动修改为：%s", sourceImage)
+	}
 	if !push && !pull {
 		return errors.New("需要指定 --pull 或 --push ")
 	}
 	list1 := strings.Split(sourceImage, ":")
-	version := list1[1]
+	version := strings.Join(list1[1:], ":")
 	list2 := strings.Split(list1[0], "/")
 	imageName := list2[len(list2)-1]
 	trgImageName := fmt.Sprintf("%s/%s:%s", tagDockerHubUser, imageName, version)
